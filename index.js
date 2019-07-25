@@ -114,6 +114,9 @@ function session(options) {
   // get the cookie signing secret
   var secret = opts.secret
 
+  // callback when destroy
+  var destroy_callback = opts.destroy_callback || ((session_id) => {return true});
+
   if (typeof generateId !== 'function') {
     throw new TypeError('genid option must be a function');
   }
@@ -300,7 +303,7 @@ function session(options) {
         return ret;
       }
 
-      if (shouldDestroy(req)) {
+      if (shouldDestroy(req) && destroy_callback(req.sessionID)) {
         // destroy session
         debug('destroying');
         store.destroy(req.sessionID, function ondestroy(err) {
